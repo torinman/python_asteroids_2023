@@ -12,7 +12,7 @@ Sound files all created by Torin Stephens
 
 Tested and developed under PyGame 2.1.2 and Python 3.8.5
 
-Copyright (C) 2020-21 Torin Stephens
+Copyright (C) 2023 Torin Stephens
 
 # Why I am making this
 
