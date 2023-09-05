@@ -10,7 +10,7 @@ The program requires PyGame and Python 3
 
 Sound files all created by Torin Stephens
 
-Tested and developed under PyGame 2.1.2 and Python 3.8.5
+Tested and developed under PyGame 2.1.2 and Python 3.10.9
 
 Copyright (C) 2023 Torin Stephens
 
