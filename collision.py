@@ -44,7 +44,7 @@ def get_segment_point_intersect(line: tuple[tuple, tuple], point: tuple[int]) ->
 
 def calculate_segment_intersect(l1: tuple[tuple, tuple], l2: tuple[tuple, tuple]) -> tuple | None:
     point = calculate_line_intersect(l1, l2)
-    if point == None:
+    if point is None:
         return None
     elif not get_segment_point_intersect(l1, point):
         return None
