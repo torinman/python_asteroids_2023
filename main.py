@@ -34,3 +34,4 @@ import pygame
 import math
 from collision import calculate_segment_intersect
 import classes
+import constants
