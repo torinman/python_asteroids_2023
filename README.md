@@ -12,10 +12,8 @@ Sound files all created by Torin Stephens
 
 Tested and developed under PyGame 2.1.2 and Python 3.10.9
 
-Copyright (C) 2023 Torin Stephens
+Here is the [original code](https://github.com/torinman/python-asteroids)
 
-Original code: https://github.com/torinman/python-asteroids
-
-# Why I am making this
+**Why I am making this**
 
 I am making this primarily because I am going to make a multiplayer version of Asteroids. In doing so, I have noticed that the original code is extremely repetetive, confusing, and unoptimised. this version is going to be much more pythonic, readable, optimized, and reuseable.
