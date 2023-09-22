@@ -16,7 +16,7 @@ class LineObj:
             lines_scaled.append(((line[0][0], line[0][1]*k), (line[1][0], line[1][1]*k)))
         return lines_scaled
 
-    def location_lines(self):
+    def location_lines(self) -> list:
         pass
 
 
@@ -39,3 +39,7 @@ class EnemyShip(Ship):
 class Asteroid(LineObj):
     def __init__(self):
         super().__init__()
+        self.lines = self.randomized_lines()
+
+    def randomized_lines(self) -> list:
+        return []
