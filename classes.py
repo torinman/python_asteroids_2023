@@ -1,4 +1,5 @@
 import constants
+import math
 
 
 class LineObj:
@@ -10,14 +11,25 @@ class LineObj:
         self.x_momentum = 0
         self.y_momentum = 0
 
-    def scaled_lines(self, k) -> list:
+    def scaled_lines(self, k: float) -> list:
         lines_scaled = []
         for line in self.lines:
-            lines_scaled.append(((line[0][0], line[0][1]*k), (line[1][0], line[1][1]*k)))
+            line_scaled = []
+            line_scaled[0] = (line[0][0], line[0][1] * k)
+            line_scaled[1] = (line[1][0], line[1][1] * k)
+            lines_scaled.append(line_scaled)
         return lines_scaled
 
     def location_lines(self) -> list:
-        pass
+        lines_cartesian = []
+        for line in self.lines:
+            line_cartesian = []
+            line_cartesian[0] = (math.sin(math.degrees(line[0][0])) * line[0][1] + self.location[0],
+                                 math.cos(math.degrees(line[0][0])) * line[0][1] + self.location[1])
+            line_cartesian[1] = (math.sin(math.degrees(line[1][0])) * line[1][1] + self.location[0],
+                                 math.cos(math.degrees(line[1][0])) * line[1][1] + self.location[1])
+            lines_cartesian.append(line_cartesian)
+        return lines_cartesian
 
 
 class Ship(LineObj):
