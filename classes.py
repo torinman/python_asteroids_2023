@@ -58,11 +58,12 @@ class Asteroid(LineObj):
 
     def randomized_lines(self,
                          segments: int = constants.ASTEROID_SEGMENTS,
-                         segment_range: float = constants.ASTEROID_SEGMENT_RANGE) -> list:
+                         segment_range: float = constants.ASTEROID_SEGMENT_RANGE,
+                         segment_angle_range: float = constants.ASTEROID_SEGMENT_ANGLE_RANGE) -> list:
         lines = []
         points = []
         for i in range(segments):
-            point = (i * (360 / segments), (random.random() * 2 - 1) * segment_range * self.size + self.size)
+            point = ((i + (random.random() * 2 - 1) * segment_angle_range) * (360 / segments), (random.random() * 2 - 1) * segment_range * self.size + self.size)
             points.append(point)
         for index, point in enumerate(points):
             line = (point, points[index-1])
