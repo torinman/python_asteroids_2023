@@ -11,7 +11,8 @@ class LineObj:
         self.angle = 0
         self.vector = (0, 0)
 
-    def scaled_lines(self, k: float) -> list:
+    def scaled_lines(self,
+                     k: float) -> list:
         lines_scaled = []
         for line in self.lines:
             line_scaled = []
@@ -61,7 +62,7 @@ class Asteroid(LineObj):
         lines = []
         points = []
         for i in range(segments):
-            point = (i * (360 / segments), (random.random() * 2 - 1) * segment_range + self.size)
+            point = (i * (360 / segments), (random.random() * 2 - 1) * segment_range * self.size + self.size)
             points.append(point)
         for index, point in enumerate(points):
             line = (point, points[index-1])
