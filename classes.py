@@ -8,8 +8,7 @@ class LineObj:
         self.scale = 1
         self.location = (0, 0)
         self.angle = 0
-        self.x_momentum = 0
-        self.y_momentum = 0
+        self.vector = (0, 0)
 
     def scaled_lines(self, k: float) -> list:
         lines_scaled = []
@@ -55,3 +54,9 @@ class Asteroid(LineObj):
 
     def randomized_lines(self) -> list:
         return []
+
+
+class Bullet:
+    def __init__(self):
+        self.location = (0, 0)
+        self.vector = (0, 0)
