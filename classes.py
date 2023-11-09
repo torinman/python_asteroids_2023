@@ -51,9 +51,9 @@ class EnemyShip(Ship):
 class Asteroid(LineObj):
     def __init__(self):
         super().__init__()
-        self.lines = self.randomized_lines()
         self.scale = 0
         self.size = constants.ASTEROID_SCALES[self.scale]
+        self.lines = self.randomized_lines()
 
     def randomized_lines(self,
                          segments: int = constants.ASTEROID_SEGMENTS,
