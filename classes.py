@@ -24,10 +24,10 @@ class LineObj:
         lines_cartesian = []
         for line in self.lines:
             line_cartesian = []
-            line_cartesian[0] = (math.sin(math.degrees(line[0][0])) * line[0][1] + self.location[0],
-                                 math.cos(math.degrees(line[0][0])) * line[0][1] + self.location[1])
-            line_cartesian[1] = (math.sin(math.degrees(line[1][0])) * line[1][1] + self.location[0],
-                                 math.cos(math.degrees(line[1][0])) * line[1][1] + self.location[1])
+            line_cartesian.append((math.sin(math.degrees(line[0][0])) * line[0][1] + self.location[0],
+                                   math.cos(math.degrees(line[0][0])) * line[0][1] + self.location[1]))
+            line_cartesian.append((math.sin(math.degrees(line[1][0])) * line[1][1] + self.location[0],
+                                   math.cos(math.degrees(line[1][0])) * line[1][1] + self.location[1]))
             lines_cartesian.append(line_cartesian)
         return lines_cartesian
 
