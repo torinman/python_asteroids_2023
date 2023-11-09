@@ -1,5 +1,6 @@
 import constants
 import math
+import random
 
 
 class LineObj:
@@ -51,9 +52,21 @@ class Asteroid(LineObj):
     def __init__(self):
         super().__init__()
         self.lines = self.randomized_lines()
+        self.scale = 0
+        self.size = constants.ASTEROID_SCALES[self.scale]
 
-    def randomized_lines(self) -> list:
-        return []
+    def randomized_lines(self,
+                         segments: int = constants.ASTEROID_SEGMENTS,
+                         segment_range: float = constants.ASTEROID_SEGMENT_RANGE) -> list:
+        lines = []
+        points = []
+        for i in range(segments):
+            point = (i * (360 / segments), (random.random() * 2 - 1) * segment_range + self.size)
+            points.append(point)
+        for index, point in enumerate(points):
+            line = (point, points[index-1])
+            lines.append(line)
+        return lines
 
 
 class Bullet:
