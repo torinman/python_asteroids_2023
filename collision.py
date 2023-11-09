@@ -1,4 +1,5 @@
-def calculate_line_intersect(l1: tuple[tuple, tuple], l2: tuple[tuple, tuple]) -> tuple | None:
+def calculate_line_intersect(l1: tuple[tuple, tuple],
+                             l2: tuple[tuple, tuple]) -> tuple | None:
     try:
         interx = (((l1[0][0]*l1[1][1]-l1[0][1]*l1[1][0])*(l2[0][0]-l2[1][0])-(l1[0][0]-l1[1][0])*(l2[0][0]*l2[1][1]-l2[0][1]*l2[1][0])) /
                   ((l1[0][0]-l1[1][0])*(l2[0][1]-l2[1][1])-(l1[0][1]-l1[1][1])*(l2[0][0]-l2[1][0])))
@@ -11,7 +12,8 @@ def calculate_line_intersect(l1: tuple[tuple, tuple], l2: tuple[tuple, tuple]) -
         return intersect
 
 
-def get_segment_point_intersect(line: tuple[tuple, tuple], point: tuple[int]) -> bool:
+def get_segment_point_intersect(line: tuple[tuple, tuple],
+                                point: tuple[int]) -> bool:
     if line[0][0] < line[1][0]:
         if point[0] < line[0][0]:
             return False
@@ -42,7 +44,8 @@ def get_segment_point_intersect(line: tuple[tuple, tuple], point: tuple[int]) ->
     return True
 
 
-def calculate_segment_intersect(l1: tuple[tuple, tuple], l2: tuple[tuple, tuple]) -> tuple | None:
+def calculate_segment_intersect(l1: tuple[tuple, tuple],
+                                l2: tuple[tuple, tuple]) -> tuple | None:
     point = calculate_line_intersect(l1, l2)
     if point is None:
         return None
