@@ -1,4 +1,4 @@
-import constants
+from constants import *
 import math
 import random
 
@@ -10,6 +10,7 @@ class LineObj:
         self.location = (0, 0)
         self.angle = 0
         self.vector = (0, 0)
+        self.angle_vector = 0
 
     def scaled_lines(self,
                      k: float) -> list:
@@ -24,13 +25,16 @@ class LineObj:
     def location_lines(self) -> list:
         lines_cartesian = []
         for line in self.lines:
-            line_cartesian = []
-            line_cartesian.append((math.sin(math.radians(line[0][0])) * line[0][1] + self.location[0],
-                                   math.cos(math.radians(line[0][0])) * line[0][1] + self.location[1]))
-            line_cartesian.append((math.sin(math.radians(line[1][0])) * line[1][1] + self.location[0],
-                                   math.cos(math.radians(line[1][0])) * line[1][1] + self.location[1]))
+            line_cartesian = [(math.sin(math.radians(line[0][0] + self.angle)) * line[0][1] + self.location[0],
+                               math.cos(math.radians(line[0][0] + self.angle)) * line[0][1] + self.location[1]),
+                              (math.sin(math.radians(line[1][0] + self.angle)) * line[1][1] + self.location[0],
+                               math.cos(math.radians(line[1][0] + self.angle)) * line[1][1] + self.location[1])]
             lines_cartesian.append(line_cartesian)
         return lines_cartesian
+
+    def move(self, frames: int = 1) -> None:
+        self.location = self.location + self.vector * frames
+        self.angle = self.angle + self.angle_vector * frames
 
 
 class Ship(LineObj):
@@ -53,17 +57,19 @@ class Asteroid(LineObj):
     def __init__(self):
         super().__init__()
         self.scale = 0
-        self.size = constants.ASTEROID_SCALES[self.scale]
+        self.size = ASTEROID_SCALES[self.scale]
         self.lines = self.randomized_lines()
+        self.angle_vector = random.random() * ASTEROID_SPIN_SPEED * 2 - ASTEROID_SPIN_SPEED
 
     def randomized_lines(self,
-                         segments: int = constants.ASTEROID_SEGMENTS,
-                         segment_range: float = constants.ASTEROID_SEGMENT_RANGE,
-                         segment_angle_range: float = constants.ASTEROID_SEGMENT_ANGLE_RANGE) -> list:
+                         segments: int = ASTEROID_SEGMENTS,
+                         segment_range: float = ASTEROID_SEGMENT_RANGE,
+                         segment_angle_range: float = ASTEROID_SEGMENT_ANGLE_RANGE) -> list:
         lines = []
         points = []
         for i in range(segments):
-            point = ((i + (random.random() * 2 - 1) * segment_angle_range) * (360 / segments), (random.random() * 2 - 1) * segment_range * self.size + self.size)
+            point = ((i + (random.random() * 2 - 1) * segment_angle_range) * (360 / segments),
+                     (random.random() * 2 - 1) * segment_range * self.size + self.size)
             points.append(point)
         for index, point in enumerate(points):
             line = (point, points[index-1])
