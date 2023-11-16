@@ -20,7 +20,7 @@ def asteroids_random_test():
             if event.type == pygame.QUIT:
                 done = True
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(constants.FPS)
 
 
 if __name__ == "__main__":

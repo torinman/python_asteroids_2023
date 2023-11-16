@@ -59,7 +59,7 @@ class Asteroid(LineObj):
         self.scale = 0
         self.size = ASTEROID_SCALES[self.scale]
         self.lines = self.randomized_lines()
-        self.angle_vector = random.random() * ASTEROID_SPIN_SPEED * 2 - ASTEROID_SPIN_SPEED
+        self.angle_vector = random.random() * (FPS / ASTEROID_SPIN_SPEED) * 2 - (FPS / ASTEROID_SPIN_SPEED)
 
     def randomized_lines(self,
                          segments: int = ASTEROID_SEGMENTS,

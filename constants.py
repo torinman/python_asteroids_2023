@@ -1,3 +1,6 @@
+# game constants
+FPS = 60
+
 # class constants
 
 # asteroid constants
@@ -5,4 +8,4 @@ ASTEROID_SCALES = [40, 20, 10]
 ASTEROID_SEGMENTS = 20
 ASTEROID_SEGMENT_ANGLE_RANGE = 0.7
 ASTEROID_SEGMENT_RANGE = 0.3
-ASTEROID_SPIN_SPEED = 2
+ASTEROID_SPIN_SPEED = 120
