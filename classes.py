@@ -33,7 +33,8 @@ class LineObj:
         return lines_cartesian
 
     def move(self, frames: int = 1) -> None:
-        self.location = self.location + self.vector * frames
+        self.location = (self.location[0] + self.vector[0] * frames,
+                         self.location[1] + self.vector[1] * frames)
         self.angle = self.angle + self.angle_vector * frames
 
 
@@ -54,12 +55,19 @@ class EnemyShip(Ship):
 
 
 class Asteroid(LineObj):
-    def __init__(self):
+    def __init__(self,
+                 scale: int = 0,
+                 location: tuple = (0, 0)):
         super().__init__()
-        self.scale = 0
+        self.scale = scale
+        self.location = location
         self.size = ASTEROID_SCALES[self.scale]
         self.lines = self.randomized_lines()
-        self.angle_vector = random.random() * (FPS / ASTEROID_SPIN_SPEED) * 2 - (FPS / ASTEROID_SPIN_SPEED)
+        self.angle_vector = (random.random() * 2 - 1) * (ASTEROID_SPIN_SPEED / FPS)
+        speed = (random.random() * 2 - 1) * (ASTEROID_SPEED / FPS)
+        angle = random.randint(0, 360)
+        self.vector = (math.sin(math.radians(angle)) * speed,
+                       math.cos(math.radians(angle)) * speed)
 
     def randomized_lines(self,
                          segments: int = ASTEROID_SEGMENTS,
@@ -76,8 +84,22 @@ class Asteroid(LineObj):
             lines.append(line)
         return lines
 
+    def split(self,
+              bullet_momentum: tuple = (0, 0)) -> list:
+        if self.scale == len(ASTEROID_SCALES) - 1:
+            return []
+        momentum = ((self.vector[0] + bullet_momentum[0] * ASTEROID_BULLET_IMPACT) * ASTEROID_IMPACT,
+                    (self.vector[1] + bullet_momentum[1] * ASTEROID_BULLET_IMPACT) * ASTEROID_IMPACT)
+        asteroids = []
+        for i in range(ASTEROID_SPLITS):
+            asteroid = Asteroid(self.scale + 1, self.location)
+            asteroid.vector = (asteroid.vector[0] + momentum[0],
+                               asteroid.vector[1] + momentum[1])
+            asteroids.append(asteroid)
+        return asteroids
+
 
 class Bullet:
-    def __init__(self):
+    def __init__(self, ):
         self.location = (0, 0)
         self.vector = (0, 0)
