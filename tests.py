@@ -1,15 +1,19 @@
+from functions import *
+from constants import *
 import classes
-import constants
 import pygame
 import random
 
 
 def asteroids_random_test():
     pygame.init()
-    asteroids = [classes.Asteroid(), classes.Asteroid()]
-    for asteroid in asteroids:
-        asteroid.location = (350, 350)
-    screen = pygame.display.set_mode((700, 700))
+    size = (700, 700)
+    asteroids = []
+    for i in range(ASTEROID_START_NUMBER):
+        asteroid = classes.Asteroid()
+        asteroid.location = on_edge()
+        asteroids.append(asteroid)
+    screen = pygame.display.set_mode(size)
     screen.fill((0, 0, 0))
     done = False
     clock = pygame.time.Clock()
@@ -17,6 +21,7 @@ def asteroids_random_test():
         screen.fill((0, 0, 0))
         for asteroid in asteroids:
             asteroid.move()
+            asteroid.wrap(size)
             for line in asteroid.location_lines():
                 pygame.draw.line(screen, (255, 255, 255), line[0], line[1])
             if random.randint(0, 200) == 1:
@@ -26,8 +31,17 @@ def asteroids_random_test():
             if event.type == pygame.QUIT:
                 done = True
         pygame.display.flip()
-        clock.tick(constants.FPS)
+        clock.tick(FPS)
+
+
+functions = [asteroids_random_test]
+function = 0
 
 
 if __name__ == "__main__":
-    asteroids_random_test()
+    from sys import argv
+
+    if "-t" in argv:
+        functions[int(argv[argv.index("-t")+1])]()
+    else:
+        functions[function]()

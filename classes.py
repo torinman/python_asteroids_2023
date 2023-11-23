@@ -37,6 +37,22 @@ class LineObj:
                          self.location[1] + self.vector[1] * frames)
         self.angle = self.angle + self.angle_vector * frames
 
+    def wrap(self,
+             size: tuple) -> None:
+        x, y = self.location
+
+        if self.location[0] < 0:
+            x = size[0]
+        elif self.location[0] > size[0]:
+            x = 0
+
+        if self.location[1] < 0:
+            y = size[1]
+        elif self.location[1] > size[1]:
+            y = 0
+
+        self.location = (x, y)
+
 
 class Ship(LineObj):
     def __init__(self):
