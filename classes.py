@@ -5,12 +5,24 @@ import random
 
 class LineObj:
     def __init__(self):
+        self._index = 0
         self.lines = []
         self.scale = 1
         self.location = (0, 0)
         self.angle = 0
         self.vector = (0, 0)
         self.angle_vector = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index < len(self.lines):
+            item = self.location_line(self._index)
+            self._index += 1
+            return item
+        else:
+            raise StopIteration
 
     def scaled_lines(self,
                      k: float) -> list:
@@ -22,13 +34,19 @@ class LineObj:
             lines_scaled.append(line_scaled)
         return lines_scaled
 
+    def location_line(self,
+                      index: int) -> tuple:
+        line = self.lines[index]
+        line_cartesian = [(math.sin(math.radians(line[0][0] + self.angle)) * line[0][1] + self.location[0],
+                           math.cos(math.radians(line[0][0] + self.angle)) * line[0][1] + self.location[1]),
+                          (math.sin(math.radians(line[1][0] + self.angle)) * line[1][1] + self.location[0],
+                           math.cos(math.radians(line[1][0] + self.angle)) * line[1][1] + self.location[1])]
+        return tuple(line_cartesian)
+
     def location_lines(self) -> list:
         lines_cartesian = []
-        for line in self.lines:
-            line_cartesian = [(math.sin(math.radians(line[0][0] + self.angle)) * line[0][1] + self.location[0],
-                               math.cos(math.radians(line[0][0] + self.angle)) * line[0][1] + self.location[1]),
-                              (math.sin(math.radians(line[1][0] + self.angle)) * line[1][1] + self.location[0],
-                               math.cos(math.radians(line[1][0] + self.angle)) * line[1][1] + self.location[1])]
+        for index in range(len(self.lines)):
+            line_cartesian = self.location_line(index)
             lines_cartesian.append(line_cartesian)
         return lines_cartesian
 

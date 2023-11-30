@@ -22,7 +22,7 @@ def asteroids_random_test():
         for asteroid in asteroids:
             asteroid.move()
             asteroid.wrap(size)
-            for line in asteroid.location_lines():
+            for line in asteroid:
                 pygame.draw.line(screen, (255, 255, 255), line[0], line[1])
             if random.randint(0, 200) == 1:
                 asteroids += asteroid.split()
