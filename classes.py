@@ -22,6 +22,7 @@ class LineObj:
             self._index += 1
             return item
         else:
+            self._index = 0
             raise StopIteration
 
     def scaled_lines(self,
