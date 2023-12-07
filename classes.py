@@ -93,8 +93,26 @@ class Ship(LineObj):
         super().__init__()
         self.bullets = []
 
-    def shoot(self) -> None:
-        pass
+    def update(self,
+               screen_size: tuple,
+               frames: int = 1) -> None:
+        self.move(frames=frames)
+        self.wrap(screen_size)
+        for bullet in self.bullets:
+            bullet.location = (bullet.location[0] + bullet.vector[0], bullet.location[1] + bullet.vector[1])
+            if bullet.location[0] > screen_size[0] or \
+               bullet.location[0] < 0 or \
+               bullet.location[1] > screen_size[1] or \
+               bullet.location[1] < 0:
+                self.bullets.remove(bullet)
+
+    def shoot(self,
+              angle: int) -> None:
+        bullet = Bullet()
+        bullet.location = self.location
+        bullet.vector = (math.sin(math.radians(angle))*BULLET_SPEED/FPS+self.vector[0],
+                         math.cos(math.radians(angle))*BULLET_SPEED/FPS+self.vector[1])
+        self.bullets.append(bullet)
 
 
 class PlayerShip(Ship):
@@ -112,6 +130,13 @@ class PlayerShip(Ship):
         self.move(frames=frames)
         self.wrap(screen_size)
         self.vector = (self.vector[0]*PLAYER_FRICTION, self.vector[1]*PLAYER_FRICTION)
+        for bullet in self.bullets:
+            bullet.location = (bullet.location[0] + bullet.vector[0], bullet.location[1] + bullet.vector[1])
+            if bullet.location[0] > screen_size[0] or \
+               bullet.location[0] < 0 or \
+               bullet.location[1] > screen_size[1] or \
+               bullet.location[1] < 0:
+                self.bullets.remove(bullet)
 
     def thrust(self,
                frames: int = 1) -> None:
@@ -189,3 +214,11 @@ class Bullet:
     def __init__(self):
         self.location = (0, 0)
         self.vector = (0, 0)
+
+    def hits(self,
+             item: LineObj) -> bool:
+        for line in item:
+            if collision.calculate_segment_intersect((self.location, (self.location[0] + self.vector[0],
+                                                                      self.location[1] + self.vector[1])), line):
+                return True
+        return False

@@ -71,7 +71,7 @@ def asteroids_collide_test():
         clock.tick(FPS)
 
 
-def ship_move():
+def ship_test():
     pygame.init()
     size = (700, 700)
     screen = pygame.display.set_mode(size, flags=pygame.RESIZABLE)
@@ -85,6 +85,9 @@ def ship_move():
         player.update(size)
         for line in player:
             pygame.draw.line(screen, (255, 255, 255), line[0], line[1])
+        for bullet in player.bullets:
+            pygame.draw.line(screen, (255, 255, 255), bullet.location, (bullet.location[0] - bullet.vector[0],
+                                                                        bullet.location[1] - bullet.vector[1]))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
@@ -97,6 +100,8 @@ def ship_move():
                     player.angle_vector += PLAYER_ANGLE_SPEED/FPS
                 elif event.key == pygame.K_RIGHT:
                     player.angle_vector -= PLAYER_ANGLE_SPEED/FPS
+                elif event.key == pygame.K_SPACE:
+                    player.shoot(player.angle)
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
                     player.stop_thrust()
@@ -108,7 +113,7 @@ def ship_move():
         clock.tick(FPS)
 
 
-functions = [asteroids_random_test, asteroids_collide_test, ship_move]
+functions = [asteroids_random_test, asteroids_collide_test, ship_test]
 function = 2
 
 

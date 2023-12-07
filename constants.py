@@ -18,6 +18,9 @@ ASTEROID_BULLET_IMPACT = 0.2
 ASTEROID_IMPACT = 0.5
 ASTEROID_SPLITS = 2
 
+# ship constants
+BULLET_SPEED = 500
+
 # player ship constants
 PLAYER_LINES = [((0, 1), (150, 1)), ((0, 1), (210, 1)), ((0, 0), (150, 1)), ((0, 0), (210, 1))]
 PLAYER_THRUST_LINES = [((150, 0.5), (180, 1)), ((210, 0.5), (180, 1))]
