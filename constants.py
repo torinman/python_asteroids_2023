@@ -1,6 +1,7 @@
 # game constants
 FPS = 60
 WINDOW_SIZE = (700, 700)
+LINE_THICKNESS = 1
 
 # class constants
 
@@ -16,3 +17,11 @@ ASTEROID_SPEED = 100
 ASTEROID_BULLET_IMPACT = 0.2
 ASTEROID_IMPACT = 0.5
 ASTEROID_SPLITS = 2
+
+# player ship constants
+PLAYER_LINES = [((0, 1), (150, 1)), ((0, 1), (210, 1)), ((0, 0), (150, 1)), ((0, 0), (210, 1))]
+PLAYER_THRUST_LINES = [((150, 0.5), (180, 1)), ((210, 0.5), (180, 1))]
+PLAYER_SCALE = 20
+PLAYER_ACCELERATION = 3
+PLAYER_FRICTION = 0.995
+PLAYER_ANGLE_SPEED = 200

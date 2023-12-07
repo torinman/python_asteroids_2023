@@ -8,8 +8,8 @@ def calculate_line_intersect(l1: tuple[tuple, tuple],
         intersect = interx, intery
     except ZeroDivisionError():
         intersect = None
-    finally:
-        return intersect
+    #finally:
+    return intersect
 
 
 def get_segment_point_intersect(line: tuple[tuple, tuple],

@@ -1,6 +1,5 @@
 from functions import *
 from constants import *
-import collision
 import classes
 import pygame
 import random
@@ -22,10 +21,9 @@ def asteroids_random_test():
     while not done:
         screen.fill((0, 0, 0))
         for asteroid in asteroids:
-            asteroid.move()
-            asteroid.wrap(size)
+            asteroid.update(size)
             for line in asteroid:
-                pygame.draw.line(screen, (255, 255, 255), line[0], line[1])
+                pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
             if random.randint(0, 200) == 1:
                 asteroids += asteroid.split()
                 asteroids.remove(asteroid)
@@ -51,29 +49,20 @@ def asteroids_collide_test():
     while not done:
         screen.fill((0, 0, 0))
         for asteroid in asteroids:
-            asteroid.move()
-            asteroid.wrap(size)
+            asteroid.update(size)
             for line in asteroid:
-                pygame.draw.line(screen, (255, 255, 255), line[0], line[1])
+                pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
             for asteroid2 in asteroids:
                 if asteroid != asteroid2:
                     if math.dist(asteroid.location, asteroid2.location) < \
                         (ASTEROID_SCALES[asteroid.scale] * (ASTEROID_SEGMENT_RANGE + 1) +
                          ASTEROID_SCALES[asteroid2.scale] * (ASTEROID_SEGMENT_RANGE + 1)):
-                        collided = False
-                        for line in asteroid:
-                            for line2 in asteroid2:
-                                if collision.calculate_segment_intersect(line, line2):
-                                    print("collision")
-                                    asteroids += asteroid.split(bullet_momentum=asteroid2.vector)
-                                    asteroids += asteroid2.split(bullet_momentum=asteroid.vector)
-                                    asteroids.remove(asteroid)
-                                    asteroids.remove(asteroid2)
-                                    collided = True
-                                    break
-                            if collided:
-                                break
-                        if collided:
+                        if asteroid.collides_with(asteroid2):
+                            print("collision")
+                            asteroids += asteroid.split(bullet_momentum=asteroid2.vector)
+                            asteroids += asteroid2.split(bullet_momentum=asteroid.vector)
+                            asteroids.remove(asteroid)
+                            asteroids.remove(asteroid2)
                             break
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -82,8 +71,45 @@ def asteroids_collide_test():
         clock.tick(FPS)
 
 
-functions = [asteroids_random_test, asteroids_collide_test]
-function = 1
+def ship_move():
+    pygame.init()
+    size = (700, 700)
+    screen = pygame.display.set_mode(size, flags=pygame.RESIZABLE)
+    screen.fill((0, 0, 0))
+    done = False
+    clock = pygame.time.Clock()
+    player = classes.PlayerShip()
+    player.location = (size[0] / 2, size[1] / 2)
+    while not done:
+        screen.fill((0, 0, 0))
+        player.update(size)
+        for line in player:
+            pygame.draw.line(screen, (255, 255, 255), line[0], line[1])
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            elif event.type == pygame.WINDOWRESIZED:
+                size = pygame.display.get_window_size()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    player.start_thrust()
+                elif event.key == pygame.K_LEFT:
+                    player.angle_vector += PLAYER_ANGLE_SPEED/FPS
+                elif event.key == pygame.K_RIGHT:
+                    player.angle_vector -= PLAYER_ANGLE_SPEED/FPS
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_UP:
+                    player.stop_thrust()
+                elif event.key == pygame.K_LEFT:
+                    player.angle_vector -= PLAYER_ANGLE_SPEED/FPS
+                elif event.key == pygame.K_RIGHT:
+                    player.angle_vector += PLAYER_ANGLE_SPEED/FPS
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+functions = [asteroids_random_test, asteroids_collide_test, ship_move]
+function = 2
 
 
 if __name__ == "__main__":

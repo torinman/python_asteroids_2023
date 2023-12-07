@@ -1,6 +1,7 @@
 from constants import *
 import math
 import random
+import collision
 
 
 class LineObj:
@@ -29,10 +30,10 @@ class LineObj:
                      k: float) -> list:
         lines_scaled = []
         for line in self.lines:
-            line_scaled = []
+            line_scaled = [0, 0]
             line_scaled[0] = (line[0][0], line[0][1] * k)
             line_scaled[1] = (line[1][0], line[1][1] * k)
-            lines_scaled.append(line_scaled)
+            lines_scaled.append(tuple(line_scaled))
         return lines_scaled
 
     def location_line(self,
@@ -72,16 +73,66 @@ class LineObj:
 
         self.location = (x, y)
 
+    def update(self,
+               screen_size: tuple,
+               frames: int = 1) -> None:
+        self.move(frames=frames)
+        self.wrap(screen_size)
+
+    def collides_with(self,
+                      item: 'LineObj') -> bool:
+        for line in self:
+            for line2 in item:
+                if collision.calculate_segment_intersect(line, line2):
+                    return True
+        return False
+
 
 class Ship(LineObj):
     def __init__(self):
         super().__init__()
         self.bullets = []
 
+    def shoot(self) -> None:
+        pass
+
 
 class PlayerShip(Ship):
     def __init__(self):
         super().__init__()
+        self.thrusting = False
+        self.lines = PLAYER_LINES
+        self.lines = self.scaled_lines(PLAYER_SCALE)
+
+    def update(self,
+               screen_size: tuple,
+               frames: int = 1) -> None:
+        if self.thrusting:
+            self.thrust(frames=frames)
+        self.move(frames=frames)
+        self.wrap(screen_size)
+        self.vector = (self.vector[0]*PLAYER_FRICTION, self.vector[1]*PLAYER_FRICTION)
+
+    def thrust(self,
+               frames: int = 1) -> None:
+        x_acceleration = math.sin(math.radians(self.angle)) * PLAYER_ACCELERATION / FPS * frames
+        y_acceleration = math.cos(math.radians(self.angle)) * PLAYER_ACCELERATION / FPS * frames
+        x_speed = self.vector[0] + x_acceleration
+        y_speed = self.vector[1] + y_acceleration
+        self.vector = (x_speed, y_speed)
+
+    def start_thrust(self):
+        self.lines = self.scaled_lines(1 / PLAYER_SCALE)
+        self.lines += PLAYER_THRUST_LINES
+        self.lines = self.scaled_lines(PLAYER_SCALE)
+        self.thrusting = True
+
+    def stop_thrust(self):
+        self.lines = self.scaled_lines(1 / PLAYER_SCALE)
+        for line in PLAYER_THRUST_LINES:
+            self.lines.remove(line)
+        self.lines = self.scaled_lines(PLAYER_SCALE)
+        self.thrusting = False
 
 
 class EnemyShip(Ship):
@@ -135,6 +186,6 @@ class Asteroid(LineObj):
 
 
 class Bullet:
-    def __init__(self, ):
+    def __init__(self):
         self.location = (0, 0)
         self.vector = (0, 0)
