@@ -1,5 +1,5 @@
 # game constants
-FPS = 60
+FPS = 30
 WINDOW_SIZE = (700, 700)
 LINE_THICKNESS = 1
 
@@ -19,7 +19,8 @@ ASTEROID_IMPACT = 0.5
 ASTEROID_SPLITS = 2
 
 # ship constants
-BULLET_SPEED = 500
+BULLET_SPEED = 420
+BULLET_SIZE = 3
 
 # player ship constants
 PLAYER_LINES = [((0, 1), (150, 1)), ((0, 1), (210, 1)), ((0, 0), (150, 1)), ((0, 0), (210, 1))]

@@ -99,7 +99,7 @@ class Ship(LineObj):
         self.move(frames=frames)
         self.wrap(screen_size)
         for bullet in self.bullets:
-            bullet.location = (bullet.location[0] + bullet.vector[0], bullet.location[1] + bullet.vector[1])
+            bullet.location = (bullet.location[0] - bullet.vector[0] * BULLET_SIZE, bullet.location[1] - bullet.vector[1] * BULLET_SIZE)
             if bullet.location[0] > screen_size[0] or \
                bullet.location[0] < 0 or \
                bullet.location[1] > screen_size[1] or \

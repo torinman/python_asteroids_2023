@@ -1,5 +1,6 @@
 import constants
 import random
+import classes
 
 
 def on_edge(size: tuple = constants.WINDOW_SIZE) -> tuple:
@@ -10,3 +11,12 @@ def on_edge(size: tuple = constants.WINDOW_SIZE) -> tuple:
     location[axis] = distance
     location[not axis] = side * size[not axis]
     return tuple(location)
+
+
+def create_asteroids(number: int = constants.ASTEROID_START_NUMBER) -> list:
+    asteroids = []
+    for i in range(number):
+        asteroid = classes.Asteroid()
+        asteroid.location = on_edge()
+        asteroids.append(asteroid)
+    return asteroids
