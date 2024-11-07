@@ -1,7 +1,13 @@
 from constants import *
+import functions
 import math
 import random
 import collision
+
+
+def set_fps(fps):
+    global FPS
+    FPS = fps
 
 
 class LineObj:
@@ -53,9 +59,9 @@ class LineObj:
         return lines_cartesian
 
     def move(self, frames: int = 1) -> None:
-        self.location = (self.location[0] + self.vector[0] * frames,
-                         self.location[1] + self.vector[1] * frames)
-        self.angle = self.angle + self.angle_vector * frames
+        self.location = (self.location[0] + self.vector[0] * frames / FPS,
+                         self.location[1] + self.vector[1] * frames / FPS)
+        self.angle = self.angle + self.angle_vector * frames / FPS
 
     def wrap(self,
              size: tuple) -> None:
@@ -92,6 +98,7 @@ class Ship(LineObj):
     def __init__(self):
         super().__init__()
         self.bullets = []
+        self.timeout = 0
 
     def update(self,
                screen_size: tuple,
@@ -110,8 +117,8 @@ class Ship(LineObj):
               angle: int) -> None:
         bullet = Bullet()
         bullet.location = self.location
-        bullet.vector = (math.sin(math.radians(angle))*BULLET_SPEED/FPS+self.vector[0],
-                         math.cos(math.radians(angle))*BULLET_SPEED/FPS+self.vector[1])
+        bullet.vector = (math.sin(math.radians(angle))*BULLET_SPEED/FPS+self.vector[0]/FPS,
+                         math.cos(math.radians(angle))*BULLET_SPEED/FPS+self.vector[1]/FPS)
         self.bullets.append(bullet)
 
 
@@ -140,8 +147,8 @@ class PlayerShip(Ship):
 
     def thrust(self,
                frames: int = 1) -> None:
-        x_acceleration = math.sin(math.radians(self.angle)) * PLAYER_ACCELERATION / FPS * frames
-        y_acceleration = math.cos(math.radians(self.angle)) * PLAYER_ACCELERATION / FPS * frames
+        x_acceleration = math.sin(math.radians(self.angle)) * PLAYER_ACCELERATION * frames
+        y_acceleration = math.cos(math.radians(self.angle)) * PLAYER_ACCELERATION * frames
         x_speed = self.vector[0] + x_acceleration
         y_speed = self.vector[1] + y_acceleration
         self.vector = (x_speed, y_speed)
@@ -161,8 +168,49 @@ class PlayerShip(Ship):
 
 
 class EnemyShip(Ship):
-    def __init__(self):
+    def __init__(self,
+                 type: int):
         super().__init__()
+        self.type = type
+        self.dying = False
+        self.lines = ENEMY_LINES
+        self.lines = self.scaled_lines(ENEMY_SCALES[self.type])
+        self.vector = ((random.random()-0.5)*ENEMY_MOVEMENT_SPEED*2, (random.random()-0.5)*ENEMY_MOVEMENT_SPEED*2)
+        self.accuracy = ENEMY_ACCURACIES[type]
+
+    def update(self,
+               screen_size: tuple,
+               target: tuple,
+               frames: int = 1) -> None:
+        if not self.dying:
+            self.update_movement()
+            self.random_shoot(target)
+            self.wrap(screen_size)
+        self.move(frames=frames)
+        for bullet in self.bullets:
+            bullet.location = (bullet.location[0] + bullet.vector[0], bullet.location[1] + bullet.vector[1])
+            if bullet.location[0] > screen_size[0] or \
+               bullet.location[0] < 0 or \
+               bullet.location[1] > screen_size[1] or \
+               bullet.location[1] < 0:
+                self.bullets.remove(bullet)
+
+    def update_movement(self) -> None:
+        if random.randint(0, FPS//ENEMY_MOVEMENT_CHANCE) == 0:
+            self.vector = ((random.random()-0.5)*ENEMY_MOVEMENT_SPEED*2, (random.random()-0.5)*ENEMY_MOVEMENT_SPEED*2)
+
+    def random_shoot(self, target):
+        if random.randint(0, ENEMY_BULLET_FREQUENCY*FPS) == 0:
+            angle = functions.get_angle(self.location, target)
+            self.shoot(angle+random.randint(round(self.accuracy)*-1, round(self.accuracy)))
+
+    def shoot(self,
+              angle: int) -> None:
+        bullet = Bullet()
+        bullet.location = self.location
+        bullet.vector = (math.sin(math.radians(angle))*BULLET_SPEED/FPS,
+                         math.cos(math.radians(angle))*BULLET_SPEED/FPS)
+        self.bullets.append(bullet)
 
 
 class Asteroid(LineObj):
@@ -174,8 +222,8 @@ class Asteroid(LineObj):
         self.location = location
         self.size = ASTEROID_SCALES[self.scale]
         self.lines = self.randomized_lines()
-        self.angle_vector = (random.random() * 2 - 1) * (ASTEROID_SPIN_SPEED / FPS)
-        speed = (random.random() * 2 - 1) * (ASTEROID_SPEED / FPS)
+        self.angle_vector = (random.random() * 2 - 1) * (ASTEROID_SPIN_SPEED)
+        speed = (random.random() * 2 - 1) * (ASTEROID_SPEED)
         angle = random.randint(0, 360)
         self.vector = (math.sin(math.radians(angle)) * speed,
                        math.cos(math.radians(angle)) * speed)
@@ -218,7 +266,71 @@ class Bullet:
     def hits(self,
              item: LineObj) -> bool:
         for line in item:
-            if collision.calculate_segment_intersect((self.location, (self.location[0] + self.vector[0],
-                                                                      self.location[1] + self.vector[1])), line):
-                return True
+            if math.dist(line[0], self.location) < 1000:
+                if collision.calculate_segment_intersect((self.location, (self.location[0] + self.vector[0],
+                                                                          self.location[1] + self.vector[1])), line):
+                    return True
         return False
+
+
+class Explosion:
+    def __init__(self) -> None:
+        self._index = 0
+        self.parts = []
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index < len(self.parts):
+            item = self.finished_line(self._index)
+            self._index += 1
+            return item
+        else:
+            self._index = 0
+            raise StopIteration
+
+    def create_parts(self,
+                     location: tuple,
+                     lines: list,
+                     max_frames: int,
+                     angle: int,
+                     vector: tuple = (0, 0),
+                     repetition: int = 2,
+                     expansion: float = EXPLOSION_MOVEMENT_SPEED) -> None:
+        for line in lines:
+            for i in range(repetition):
+                cartesian = self.location_line(line, angle, location)
+                self.parts += [[cartesian[0], [functions.get_angle(cartesian[0], cartesian[1]),
+                                               math.dist(cartesian[0], cartesian[1])],
+                                random.randint(0, int(max_frames)),
+                                (random.random()-0.5)*EXPLOSION_ROTATION_SPEED/FPS*2,
+                                ((random.random()-0.5)*expansion*2+random.random()*vector[0], (random.random()-0.5)*expansion*2+random.random()*vector[1])]]
+
+    def update(self) -> None:
+        newparts = []
+        for part in self.parts:
+            if part[2] >= 0:
+                part[2] -= 1
+                part[1][0] += part[3]
+                part[0] = (part[0][0]+part[4][0]/FPS, part[0][1]+part[4][1]/FPS)
+                newparts += [part]
+        self.parts = newparts
+
+    def finished_line(self,
+                      index: int) -> tuple:
+        line = self.parts[index]
+        line_cartesian = [line[0],
+                          (math.sin(math.radians(line[1][0])) * line[1][1] + line[0][0],
+                           math.cos(math.radians(line[1][0])) * line[1][1] + line[0][1])]
+        return tuple(line_cartesian)
+
+    def location_line(self,
+                      line: tuple,
+                      angle: int,
+                      location: tuple) -> tuple:
+        line_cartesian = [(math.sin(math.radians(line[0][0] + angle)) * line[0][1] + location[0],
+                           math.cos(math.radians(line[0][0] + angle)) * line[0][1] + location[1]),
+                          (math.sin(math.radians(line[1][0] + angle)) * line[1][1] + location[0],
+                           math.cos(math.radians(line[1][0] + angle)) * line[1][1] + location[1])]
+        return tuple(line_cartesian)

@@ -1,6 +1,7 @@
 import constants
 import random
 import classes
+import math
 
 
 def on_edge(size: tuple = constants.WINDOW_SIZE) -> tuple:
@@ -13,10 +14,20 @@ def on_edge(size: tuple = constants.WINDOW_SIZE) -> tuple:
     return tuple(location)
 
 
-def create_asteroids(number: int = constants.ASTEROID_START_NUMBER) -> list:
+def create_asteroids(size: tuple,
+                     number: int = constants.ASTEROID_START_NUMBER) -> list:
     asteroids = []
     for i in range(number):
         asteroid = classes.Asteroid()
-        asteroid.location = on_edge()
+        asteroid.location = on_edge(size)
         asteroids.append(asteroid)
     return asteroids
+
+
+def get_angle(p1, p2):
+    dist = math.dist(p1, p2)
+    sin = (p2[0]-p1[0])/dist
+    angle = math.degrees(math.asin(sin))
+    if p1[1] > p2[1]:
+        angle = (angle-180)*-1
+    return angle
