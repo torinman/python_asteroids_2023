@@ -200,7 +200,7 @@ class EnemyShip(Ship):
             self.vector = ((random.random()-0.5)*ENEMY_MOVEMENT_SPEED*2, (random.random()-0.5)*ENEMY_MOVEMENT_SPEED*2)
 
     def random_shoot(self, target):
-        if random.randint(0, ENEMY_BULLET_FREQUENCY*FPS) == 0:
+        if random.randint(0, round(ENEMY_BULLET_FREQUENCY*FPS)) == 0:
             angle = functions.get_angle(self.location, target)
             self.shoot(angle+random.randint(round(self.accuracy)*-1, round(self.accuracy)))
 

@@ -488,7 +488,7 @@ def ship_test_enemy():
                 enemy.accuracy = enemy_accuracy
         if player.timeout:
             player.timeout -= 1
-        else:
+        elif player.timeout <= 0:
             for line in player:
                 pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
         for bullet in player.bullets:
@@ -560,6 +560,7 @@ def ship_test_enemy():
                 enemy.accuracy = enemy_accuracy
         pygame.display.flip()
         clock.tick(FPS)
+        print(player.timeout)
 
 
 functions = [asteroids_random_test,          # 0
