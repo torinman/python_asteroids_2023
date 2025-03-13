@@ -37,7 +37,7 @@ from functions import *
 
 def main():
     global FPS
-    lives = PLAYER_LIVES*100
+    lives = PLAYER_LIVES
     keys_down = []
     pygame.init()
     size = WINDOW_SIZE
