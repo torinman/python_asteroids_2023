@@ -29,6 +29,7 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see  <https://www.gnu.org/licenses/>.
+import math
 import random
 
 import pygame
@@ -93,13 +94,14 @@ def main():
             if enemy.dying and not pygame.Rect((0, 0, size[0], size[1])).collidepoint(enemy.location):
                 enemies.remove(enemy)
         if player.timeout > 0:
+            for asteroid in asteroids:
+                if math.dist(player.location, asteroid.location) < 100:
+                    player.timeout += 1
+                    break
             player.timeout -= 1
         else:
             for line in player:
                 pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
-        explosion.update()
-        for line in explosion:
-            pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
         for bullet in player.bullets:
             pygame.draw.line(screen, (255, 255, 255), bullet.location,
                              (bullet.location[0] - bullet.vector[0] * (FPS/60) * BULLET_SIZE,
@@ -109,11 +111,7 @@ def main():
                     player.bullets.remove(bullet)
                     explosion.create_parts(enemy.location, enemy.lines, FPS * EXPLOSION_DECAY_SECONDS, 0, enemy.vector)
                     enemies.remove(enemy)
-        for asteroid in asteroids:
-            asteroid.update(size)
-            for line in asteroid:
-                pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
-            for bullet in player.bullets:
+            for asteroid in asteroids:
                 if bullet.hits(asteroid):
                     asteroids += asteroid.split(bullet.vector)
                     explosion.create_parts(asteroid.location, asteroid.lines, FPS, asteroid.angle,
@@ -124,6 +122,13 @@ def main():
                     if not asteroids:
                         current_asteroids += ASTEROID_NUMBER_INCREASE
                         asteroids = create_asteroids(size, current_asteroids)
+        explosion.update()
+        for line in explosion:
+            pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
+        for asteroid in asteroids:
+            asteroid.update(size)
+            for line in asteroid:
+                pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
             if not player.timeout:
                 if asteroid.collides_with(player):
                     explosion.create_parts(player.location, player.lines*EXPLOSION_PLAYER_MULTIPLIER, FPS * EXPLOSION_DECAY_SECONDS, player.angle,
