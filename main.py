@@ -81,6 +81,9 @@ def main():
                     player.location = (size[0] / 2, size[1] / 2)
                     player.vector = (0, 0)
                     enemy.dying = True
+                    lives -= 1
+                    if not lives:
+                        done = True
                     player.timeout = round(PLAYER_OUT * FPS)
             if not player.timeout:
                 if player.collides_with(enemy):
@@ -90,6 +93,9 @@ def main():
                     player.vector = (0, 0)
                     player.timeout = round(PLAYER_OUT * FPS)
                     enemies.remove(enemy)
+                    lives -= 1
+                    if not lives:
+                        done = True
                     explosion.create_parts(enemy.location, enemy.lines, FPS * EXPLOSION_DECAY_SECONDS, 0, enemy.vector)
             if enemy.dying and not pygame.Rect((0, 0, size[0], size[1])).collidepoint(enemy.location):
                 enemies.remove(enemy)
@@ -111,17 +117,20 @@ def main():
                     player.bullets.remove(bullet)
                     explosion.create_parts(enemy.location, enemy.lines, FPS * EXPLOSION_DECAY_SECONDS, 0, enemy.vector)
                     enemies.remove(enemy)
-            for asteroid in asteroids:
-                if bullet.hits(asteroid):
-                    asteroids += asteroid.split(bullet.vector)
-                    explosion.create_parts(asteroid.location, asteroid.lines, FPS, asteroid.angle,
-                                           vector=asteroid.vector, repetition=1,
-                                           expansion=ASTEROID_SCALES[asteroid.scale] / FPS * 2)
-                    asteroids.remove(asteroid)
-                    player.bullets.remove(bullet)
-                    if not asteroids:
-                        current_asteroids += ASTEROID_NUMBER_INCREASE
-                        asteroids = create_asteroids(size, current_asteroids)
+                    break
+            else:
+                for asteroid in asteroids:
+                    if bullet.hits(asteroid):
+                        asteroids += asteroid.split(bullet.vector)
+                        explosion.create_parts(asteroid.location, asteroid.lines, FPS, asteroid.angle,
+                                               vector=asteroid.vector, repetition=1,
+                                               expansion=ASTEROID_SCALES[asteroid.scale] / FPS * 2)
+                        asteroids.remove(asteroid)
+                        player.bullets.remove(bullet)
+                        if not asteroids:
+                            current_asteroids += ASTEROID_NUMBER_INCREASE
+                            asteroids = create_asteroids(size, current_asteroids)
+                        break
         explosion.update()
         for line in explosion:
             pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
