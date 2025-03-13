@@ -181,10 +181,12 @@ class EnemyShip(Ship):
     def update(self,
                screen_size: tuple,
                target: tuple,
-               frames: int = 1) -> None:
+               frames: int = 1,
+               shoot: bool = True) -> None:
         if not self.dying:
             self.update_movement()
-            self.random_shoot(target)
+            if shoot:
+                self.random_shoot(target)
             self.wrap(screen_size)
         self.move(frames=frames)
         for bullet in self.bullets:

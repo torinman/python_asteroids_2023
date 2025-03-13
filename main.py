@@ -32,13 +32,12 @@
 import random
 
 import pygame
-import classes
 from constants import *
 from functions import *
 
 def main():
     global FPS
-    lives = PLAYER_LIVES
+    lives = PLAYER_LIVES*100
     keys_down = []
     pygame.init()
     size = WINDOW_SIZE
@@ -55,7 +54,6 @@ def main():
     enemies = []
     enemy_accuracy = ENEMY_ACCURACIES[0]
     while not done:
-        print(enemies)
         screen.fill((0, 0, 0))
         for i in range(ENEMY_AMOUNT-len(enemies)):
             if random.randint(0, round(ENEMY_TIME*FPS)) == 0:
@@ -67,7 +65,7 @@ def main():
                 enemies.append(enemy)
         player.update(size)
         for enemy in enemies:
-            enemy.update(size, player.location)
+            enemy.update(size, player.location, shoot=not player.timeout)
             for line in enemy:
                 pygame.draw.line(screen, (255, 255, 255), line[0], line[1], width=LINE_THICKNESS)
             for bullet in enemy.bullets:
@@ -83,14 +81,15 @@ def main():
                     player.vector = (0, 0)
                     enemy.dying = True
                     player.timeout = round(PLAYER_OUT * FPS)
-            if player.collides_with(enemy):
-                explosion.create_parts(player.location, player.lines, FPS * EXPLOSION_DECAY_SECONDS, player.angle,
-                                       player.vector)
-                player.location = (size[0] / 2, size[1] / 2)
-                player.vector = (0, 0)
-                player.timeout = round(PLAYER_OUT * FPS)
-                enemies.remove(enemy)
-                explosion.create_parts(enemy.location, enemy.lines, FPS * EXPLOSION_DECAY_SECONDS, 0, enemy.vector)
+            if not player.timeout:
+                if player.collides_with(enemy):
+                    explosion.create_parts(player.location, player.lines, FPS * EXPLOSION_DECAY_SECONDS, player.angle,
+                                           player.vector)
+                    player.location = (size[0] / 2, size[1] / 2)
+                    player.vector = (0, 0)
+                    player.timeout = round(PLAYER_OUT * FPS)
+                    enemies.remove(enemy)
+                    explosion.create_parts(enemy.location, enemy.lines, FPS * EXPLOSION_DECAY_SECONDS, 0, enemy.vector)
             if enemy.dying and not pygame.Rect((0, 0, size[0], size[1])).collidepoint(enemy.location):
                 enemies.remove(enemy)
         if player.timeout > 0:
@@ -125,16 +124,16 @@ def main():
                     if not asteroids:
                         current_asteroids += ASTEROID_NUMBER_INCREASE
                         asteroids = create_asteroids(size, current_asteroids)
-                    break
-            if asteroid.collides_with(player) and not player.timeout:
-                explosion.create_parts(player.location, player.lines*EXPLOSION_PLAYER_MULTIPLIER, FPS * EXPLOSION_DECAY_SECONDS, player.angle,
-                                       player.vector)
-                lives -= 1
-                if not lives:
-                    done = True
-                player.timeout = round(PLAYER_OUT * FPS)
-                player.location = (size[0] / 2, size[1] / 2)
-                player.vector = (0, 0)
+            if not player.timeout:
+                if asteroid.collides_with(player):
+                    explosion.create_parts(player.location, player.lines*EXPLOSION_PLAYER_MULTIPLIER, FPS * EXPLOSION_DECAY_SECONDS, player.angle,
+                                           player.vector)
+                    lives -= 1
+                    if not lives:
+                        done = True
+                    player.timeout = round(PLAYER_OUT * FPS)
+                    player.location = (size[0] / 2, size[1] / 2)
+                    player.vector = (0, 0)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
